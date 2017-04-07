@@ -16,11 +16,11 @@ int main()
     int i = 0;
     char buffer1[13312];
     char buffer2[13312];
-    buffer2[0] ='h';
-    buffer2[1] ='e';
-    buffer2[2] ='l';
-    buffer2[3] ='l';
-    buffer2[4] ='o';
+    buffer2[0] = 'h';
+    buffer2[1] = 'e';
+    buffer2[2] = 'l';
+    buffer2[3] = 'l';
+    buffer2[4] = 'o';
     for (i = 5; i < 13312; i++)
         buffer2[i] = 0x0;
     makeInterrupt21();
@@ -286,12 +286,14 @@ void deleteFile(char *name)
     writeSector(map, 1);
     writeSector(directory, 2);
 }
+
 void writeFile(char *name, char *buffer, int secNum)
 {
 
     int i;
     int j;
     int x;
+    int z;
     int l;
     int fileChanger;
     char map[512];
@@ -323,7 +325,7 @@ void writeFile(char *name, char *buffer, int secNum)
         ////5leha be boolean
         if (z == 512)
         {
-            printString("Error can't find empty place \r'");
+            printString("Error !!");
             return;
         }
         else
@@ -334,7 +336,7 @@ void writeFile(char *name, char *buffer, int secNum)
         }
     }
 
-    for (l = 6 + secNum; l < 32 l++)
+    for (l = 6 + secNum; l < 32; l++)
     {
         directory[i * 32 + l] = 0x00;
     }
@@ -381,8 +383,11 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
     }
     else if (ax == 8)
     {
+
+        writeFile(bx, cx, dx);
     }
-    else if (ax > 7)
+
+    else if (ax > 8)
     {
         printString("Interrupt error\0");
     }
