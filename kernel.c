@@ -13,20 +13,26 @@ void handleInterrupt21(int, int, int, int);
 
 int main()
 {
-    int i = 0;
-    char buffer1[13312];
-    char buffer2[13312];
-    buffer2[0] = 'h';
-    buffer2[1] = 'e';
-    buffer2[2] = 'l';
-    buffer2[3] = 'l';
-    buffer2[4] = 'o';
-    for (i = 5; i < 13312; i++)
-        buffer2[i] = 0x0;
     makeInterrupt21();
-    interrupt(0x21, 8, "testW\0", buffer2, 1); //write file testW
-    interrupt(0x21, 3, "testW\0", buffer1, 0); //read file testW
-    interrupt(0x21, 0, buffer1, 0, 0);         // print out contents of testW
+    // printString("Ser fahdo salutes you");
+    printString("Hello");
+    interrupt(0x21, 4, "shell\0", 0x2000, 0);
+    while (1)
+        ;
+    // int i = 0;
+    // char buffer1[13312];
+    // char buffer2[13312];
+    // buffer2[0] = 'h';
+    // buffer2[1] = 'e';
+    // buffer2[2] = 'l';
+    // buffer2[3] = 'l';
+    // buffer2[4] = 'o';
+    // for (i = 5; i < 13312; i++)
+    //     buffer2[i] = 0x0;
+    // makeInterrupt21();
+    // interrupt(0x21, 8, "testW\0", buffer2, 1); //write file testW
+    // interrupt(0x21, 3, "testW\0", buffer1, 0); //read file testW
+    // interrupt(0x21, 0, buffer1, 0, 0);         // print out contents of testW
 }
 
 void printString(char *chars)
@@ -322,7 +328,7 @@ void writeFile(char *name, char *buffer, int secNum)
             if (map[z] == 0x00)
                 break;
         }
-        ////5leha be boolean
+        ////momkn  be boolean
         if (z == 512)
         {
             printString("Error !!");
@@ -344,6 +350,10 @@ void writeFile(char *name, char *buffer, int secNum)
     //update the map and the directory
     writeSector(map, 1);
     writeSector(directory, 2);
+}
+
+void listFile(char *buffer)
+{
 }
 
 void handleInterrupt21(int ax, int bx, int cx, int dx)
@@ -386,8 +396,12 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
 
         writeFile(bx, cx, dx);
     }
+    else if (ax == 9)
+    {
+        listFile(bx);
+    }
 
-    else if (ax > 8)
+    else if (ax > 9)
     {
         printString("Interrupt error\0");
     }
