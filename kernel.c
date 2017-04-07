@@ -7,6 +7,7 @@ void readFile(char *, char *);
 void executeProgram(char *, int);
 void writeSector(char *, int);
 void deleteFile(char *);
+void writeFile(char *, char *, int);
 void terminate();
 void handleInterrupt21(int, int, int, int);
 
@@ -276,6 +277,60 @@ void deleteFile(char *name)
     writeSector(map, 1);
     writeSector(directory, 2);
 }
+void writeFile(char *name, char *buffer, int secNum)
+{
+
+    int i;
+    int j;
+    int x;
+    int l;
+    int fileChanger;
+    char map[512];
+    char directory[512];
+    readSector(map, 1);
+    readSector(directory, 2);
+    for (i = 0; i < 16; i++)
+    {
+        if (directory[i * 32] == 0x00)
+        {
+            for (j = 0; j < 6; j++)
+            {
+                if (name[j] != 0x00)
+                    directory[i * 32 + j] = name[j];
+                else
+                    directory[i * 32 + j] = 0x00;
+            }
+            break;
+        }
+    }
+    for (x = 6; x < secNum + 6; x++)
+    {
+
+        for (z = 0; z < 512; z++)
+        {
+            if (map[z] == 0x00)
+                break;
+        }
+        ////5leha be boolean
+        if (z == 512)
+            return;
+        else
+        {
+            map[z] = 0xFF;
+            directory[i * 32 + x] = z;
+            writeSector(buffer + (x - 6) * 512, z);
+        }
+    }
+
+    for (l = 6 + secNum; l < 32 l++)
+    {
+        directory[i * 32 + l] = 0x00;
+    }
+
+    //update the map and the directory
+    writeSector(map, 1);
+    writeSector(directory, 2);
+}
 
 void handleInterrupt21(int ax, int bx, int cx, int dx)
 {
@@ -311,6 +366,9 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
     else if (ax == 7)
     {
         deleteFile(bx);
+    }
+    else if (ax == 8)
+    {
     }
     else if (ax > 7)
     {
