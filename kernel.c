@@ -13,11 +13,20 @@ void handleInterrupt21(int, int, int, int);
 
 int main()
 {
-    char buffer[13312];
+    int i = 0;
+    char buffer1[13312];
+    char buffer2[13312];
+    buffer2[0] ='h';
+    buffer2[1] ='e';
+    buffer2[2] ='l';
+    buffer2[3] ='l';
+    buffer2[4] ='o';
+    for (i = 5; i < 13312; i++)
+        buffer2[i] = 0x0;
     makeInterrupt21();
-    interrupt(0x21, 7, "messag\0", 0, 0);      //delete messag
-    interrupt(0x21, 3, "messag\0", buffer, 0); // try to read messag
-    interrupt(0x21, 0, buffer, 0, 0);          //print out the contents of buffer
+    interrupt(0x21, 8, "testW\0", buffer2, 1); //write file testW
+    interrupt(0x21, 3, "testW\0", buffer1, 0); //read file testW
+    interrupt(0x21, 0, buffer1, 0, 0);         // print out contents of testW
 }
 
 void printString(char *chars)
@@ -313,7 +322,10 @@ void writeFile(char *name, char *buffer, int secNum)
         }
         ////5leha be boolean
         if (z == 512)
+        {
+            printString("Error can't find empty place \r'");
             return;
+        }
         else
         {
             map[z] = 0xFF;
