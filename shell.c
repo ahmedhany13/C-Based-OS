@@ -63,7 +63,7 @@ void Input(char *buff)
 	fileName[6] = "\0";
 
 	interrupt(0x21, 3, fileName, fileBuffer, 0); /*read el file fl buffer*/
-	interrupt(0x21, 0, fileBuffer, 0, 0);	/*print elfile*/
+	interrupt(0x21, 0, fileName, 0, 0);	/*print elfile*/
     }
 
     else if (isEqual("execute\0", buff))
@@ -97,8 +97,8 @@ void Input(char *buff)
 
     else if (isEqual("dir\0", buff))
     {
-	interrupt(0x21, 9, 0, 0, 0);
-	interrupt(0x21, 0, 0, 0, 0);	
+	interrupt(0x21, 9, fileName, 0, 0); //calling the function that list all the files 
+	interrupt(0x21, 0, fileName, 0, 0); //printing the list of files
 	Print("Shell-> ");
     }
 

@@ -8,6 +8,7 @@ void executeProgram(char *, int);
 void writeSector(char *, int);
 void deleteFile(char *);
 void writeFile(char *, char *, int);
+void ls(char *);
 void terminate();
 void handleInterrupt21(int, int, int, int);
 
@@ -352,8 +353,39 @@ void writeFile(char *name, char *buffer, int secNum)
     writeSector(directory, 2);
 }
 
-void listFile(char *buffer)
+void ls(char *result)
 {
+    int fileChanger = 0;
+    int startingSector;
+    int i;
+    int j;
+    int sec;
+    int notSameChar = 0;
+    int n = 0;
+    int incrementerOfAddress;
+    int dirSectors[27];
+    char directory[512];
+    readSector(directory, 2);
+
+    for (i = 0; i < 16; i++)
+    {
+
+        if (directory[i * 32] != 0x00)
+        {
+            for (j = 0; j < 6; j++)
+            {
+                if (directory[i * 32 + j] != 0x00)
+                    result[n * (6 + 1) + j] = directory[i * 32 + j];
+
+                if (directory[i * 32 + j] == 0x00)
+                    result[n * (6 + 1) + j] = '\n';
+            }
+            result[n * (6 + 1) + j] = ' ';
+            n++;
+        }
+    }
+
+    result[n * (6 + 1)] = '\0';
 }
 
 void handleInterrupt21(int ax, int bx, int cx, int dx)
@@ -398,7 +430,7 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
     }
     else if (ax == 9)
     {
-        listFile(bx);
+        ls(bx);
     }
 
     else if (ax > 9)
