@@ -19,4 +19,3 @@ gcc -o loadFile loadFile.c
 ./loadFile tstpr2
 ./loadFile tstprg
 
-bochs -f config.bxrc

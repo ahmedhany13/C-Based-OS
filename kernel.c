@@ -5,16 +5,18 @@ int div(int, int);
 void readSector(char *, int);
 void readFile(char *, char *);
 void executeProgram(char *, int);
+void writeSector(char *, int);
+void deleteFile(char *);
 void terminate();
 void handleInterrupt21(int, int, int, int);
 
 int main()
 {
+    char buffer[13312];
     makeInterrupt21();
-    printString("sada");
-    interrupt(0x21, 4, "shell\0", 0x2000, 0);
-    while (1)
-        ;
+    interrupt(0x21, 7, "messag\0", 0, 0);      //delete messag
+    interrupt(0x21, 3, "messag\0", buffer, 0); // try to read messag
+    interrupt(0x21, 0, buffer, 0, 0);          //print out the contents of buffer
 }
 
 void printString(char *chars)
@@ -218,7 +220,61 @@ void writeSector(char *buffer, int sector)
 
 void deleteFile(char *name)
 {
-    
+    int i;
+    int j;
+    int x;
+    int fileChanger;
+    int notSameChar = 0;
+    int result = 20;
+    char map[512];
+    char directory[512];
+    readSector(map, 1);
+    readSector(directory, 2);
+
+    for (i = 0; i < 16; i++)
+    {
+
+        for (j = 0; j < 6; j++)
+        {
+            if (directory[j + fileChanger] == name[j])
+            {
+                notSameChar = 0;
+            }
+            else
+            {
+                notSameChar = 1;
+            }
+            if (notSameChar == 1)
+            {
+                break;
+            }
+        }
+        //go to the next file
+        fileChanger += 32;
+
+        if (notSameChar == 0)
+        {
+            //i is the no. of file .
+            result = i;
+        }
+
+        if (result != 20)
+        {
+            //clearing the first byte of the directory to 0x00
+            directory[result * 32] = 0x00;
+
+            //clearing the correspoding sector in the map;
+            for (x = 6; x <= 31; x++)
+            {
+                map[directory[result * 32 + x]] = 0x00;
+            }
+            //we found the file then go out of the loop
+            break;
+        }
+    }
+    //update the map and the directory
+    writeSector(map, 1);
+    writeSector(directory, 2);
 }
 
 void handleInterrupt21(int ax, int bx, int cx, int dx)
@@ -252,7 +308,11 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
     {
         writeSector(bx, cx);
     }
-    else if (ax > 6)
+    else if (ax == 7)
+    {
+        deleteFile(bx);
+    }
+    else if (ax > 7)
     {
         printString("Interrupt error\0");
     }
