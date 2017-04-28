@@ -1,3 +1,14 @@
+//---------------------local variables-----------------------------------
+struct processTable
+{
+    int active;
+    int sp;
+} entry[8];
+
+int currentProcess;
+//--------------------- End of local variables---------------------------
+
+//---------------------methods signtures---------------------------------
 void printString(char *);
 void readString(char *);
 int mod(int, int);
@@ -11,11 +22,24 @@ void writeFile(char *, char *, int);
 void ls(char *);
 void terminate();
 void handleInterrupt21(int, int, int, int);
+void handleTimerInterrupt(int, int);
+//---------------------End of methods signtures---------------------------------
 
+//------------------------ main method -----------------------------------
 int main()
 {
+    //********initialize process table ***************************
+    int i;
+    for (i = 0; i < 8; i++)
+    {
+        entry[i].active = 0;
+        entry[i].sp = 0xFF00;
+    }
+    currentProcess = 0;
+    //************************************************************
     makeInterrupt21();
-    // printString("Ser fahdo salutes you");
+    makeTimerInterrupt();
+    printString("Ser fahdo salutes you");
     printString("Hello");
     interrupt(0x21, 4, "shell\0", 0x2000, 0);
     while (1)
@@ -35,6 +59,8 @@ int main()
     // interrupt(0x21, 3, "testW\0", buffer1, 0); //read file testW
     // interrupt(0x21, 0, buffer1, 0, 0);         // print out contents of testW
 }
+
+//------------------------ end of main method -----------------------------
 
 void printString(char *chars)
 {
@@ -189,12 +215,27 @@ void readFile(char *fileName, char *buffer)
     }
 }
 
-void executeProgram(char *name, int segment)
+void executeProgram(char *name)
 {
     //step 2
     int currentFromBuffer = 0;
-
+    int i, segment, var;
+    int isFree = 0;
     char buffer[13312]; /*this is the maximum size of a file*/
+
+    //********* search through the process table for a free entry****************
+    for (i = 0; i < 8 && isFree == 0; i++)
+    {
+        var = entry[i].active;
+        if (var == 0)
+        { //found an empty entry
+            // restoreDataSegment();
+            isFree = 1;
+        }
+    }
+    //****************************************************************************
+    
+    segment = (i * 0x1000) + (0x1000 * 2);
 
     //step 1
     readFile(name, buffer);
@@ -388,6 +429,12 @@ void ls(char *result)
     result[n * (6 + 1)] = '\0';
 }
 
+void handleTimerInterrupt(int segment, int sp)
+{
+    // printString("Tic");
+    returnFromTimer(segment, sp);
+}
+
 void handleInterrupt21(int ax, int bx, int cx, int dx)
 {
     if (ax == 0)
@@ -409,7 +456,7 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
 
     else if (ax == 4)
     {
-        executeProgram(bx, cx);
+        executeProgram(bx);
     }
     else if (ax == 5)
     {
