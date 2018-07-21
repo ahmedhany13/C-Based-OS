@@ -1,8 +1,8 @@
 # C-Based-Operating-System
 
-This a simulation for a simple C Based Operating System  
+This a simulation for a simple Operating System Shell
 
-first in order to run you need : 
+## First in order to run you need : 
 
 • Bochs x86 Processor Simulator: type sudo apt-get install bochs
 and sudo apt-get install bochs-x in a terminal to download Bochs.
