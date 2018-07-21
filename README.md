@@ -24,14 +24,19 @@ To get hexedit type sudo apt-get install hexedit.
 
 • A text editor.
 
-now to run the files open the terminal and enter the following commands inside the terminal making sure that you're in the correct
-path , which is the path of the file M3 for example :
-
-./CompileOS.sh 
+## Now to run the files open the terminal and enter the following commands inside the terminal making sure that you're in the correct path , which is the path of the file:
+```
+$ ./CompileOS.sh 
+```
 this command compiles the files 
 
-bochs -f config.bxrc
+```
+$ bochs -f config.bxrc
 
+```
 now if you faced a black screen in bochs window , just type 
-c
+```
+$ c
+```
+
 in the terminal and it will do the trick 
